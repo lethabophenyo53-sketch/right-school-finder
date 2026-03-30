@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Right School Finder</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f5f7fb;
+}
+
+header {
+  background: #1e88e5;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.container {
+  padding: 15px;
+}
+
+select, input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.school-card {
+  background: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.trend-up { color: green; }
+.trend-down { color: red; }
+.trend-same { color: gray; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Right School Finder</h1>
+  <p>Don’t judge a school by its reputation — choose based on real performance.</p>
+</header>
+
+<div class="container">
+
+<select id="districtFilter">
+  <option value="">Select District</option>
+  <option>Johannesburg West</option>
+</select>
+
+<select id="passFilter">
+  <option value="">Minimum Pass Rate</option>
+  <option value="70">70%</option>
+  <option value="80">80%</option>
+  <option value="90">90%</option>
+</select>
+
+<div id="schoolList"></div>
+
+</div>
+
+<script>
+
+// SAMPLE DATA (we will replace with your real data later)
+const schools = [
+  {
+    name: "Allen Glen High School",
+    district: "Johannesburg West",
+    pass2024: 95,
+    pass2025: 97,
+    bachelor2024: 60,
+    bachelor2025: 65
+  },
+  {
+    name: "Princess High School",
+    district: "Johannesburg West",
+    pass2024: 98,
+    pass2025: 100,
+    bachelor2024: 70,
+    bachelor2025: 75
+  }
+];
+
+function getTrend(current, previous) {
+  if (current > previous) return '<span class="trend-up">⬆️</span>';
+  if (current < previous) return '<span class="trend-down">⬇️</span>';
+  return '<span class="trend-same">➖</span>';
+}
+
+function displaySchools() {
+  const district = document.getElementById("districtFilter").value;
+  const minPass = document.getElementById("passFilter").value;
+
+  const list = document.getElementById("schoolList");
+  list.innerHTML = "";
+
+  schools.forEach(school => {
+
+    if (district && school.district !== district) return;
+    if (minPass && school.pass2025 < minPass) return;
+
+    const card = document.createElement("div");
+    card.className = "school-card";
+
+    card.innerHTML = `
+      <h3>${school.name}</h3>
+      <p>${school.district}</p>
+
+      <p>
+        2024 → Pass: ${school.pass2024}% | Bachelor: ${school.bachelor2024}%
+      </p>
+
+      <p>
+        2025 → Pass: ${school.pass2025}% ${getTrend(school.pass2025, school.pass2024)}
+        | Bachelor: ${school.bachelor2025}% ${getTrend(school.bachelor2025, school.bachelor2024)}
+      </p>
+    `;
+
+    list.appendChild(card);
+  });
+}
+
+document.getElementById("districtFilter").addEventListener("change", displaySchools);
+document.getElementById("passFilter").addEventListener("change", displaySchools);
+
+displaySchools();
+
+</script>
+
+</body>
+</html>
