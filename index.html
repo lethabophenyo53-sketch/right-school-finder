@@ -9,11 +9,11 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  background: #f5f7fb;
+  background: #f4f6fb;
 }
 
 header {
-  background: #1e88e5;
+  background: linear-gradient(135deg, #1e88e5, #42a5f5);
   color: white;
   padding: 20px;
   text-align: center;
@@ -23,20 +23,36 @@ header {
   padding: 15px;
 }
 
-select, input {
+select, input, button {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #ccc;
+}
+
+button {
+  background: #1e88e5;
+  color: white;
+  border: none;
 }
 
 .school-card {
   background: white;
-  padding: 15px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.school-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.school-info {
+  padding: 12px;
 }
 
 .trend-up { color: green; }
@@ -54,16 +70,47 @@ select, input {
 
 <div class="container">
 
+<!-- LOCATION -->
+<input id="manualLocation" placeholder="Enter location (optional)">
+
+<button onclick="getLocation()">Use My Current Location</button>
+
+<!-- DISTRICT -->
 <select id="districtFilter">
-  <option value="">Select District</option>
-  <option>Johannesburg West</option>
+<option value="">Select District</option>
+<option>Johannesburg Central</option>
+<option>Johannesburg East</option>
+<option>Johannesburg West</option>
+<option>Johannesburg North</option>
+<option>Johannesburg South</option>
+<option>Tshwane North</option>
+<option>Tshwane South</option>
+<option>Tshwane West</option>
+<option>Ekurhuleni North</option>
+<option>Ekurhuleni South</option>
+<option>Sedibeng East</option>
+<option>Sedibeng West</option>
+<option>Gauteng East</option>
+<option>Gauteng West</option>
+<option>Gauteng North</option>
 </select>
 
+<!-- PASS FILTER -->
 <select id="passFilter">
-  <option value="">Minimum Pass Rate</option>
-  <option value="70">70%</option>
-  <option value="80">80%</option>
-  <option value="90">90%</option>
+<option value="">Minimum Pass Rate</option>
+<option value="70">70%</option>
+<option value="80">80%</option>
+<option value="90">90%</option>
+</select>
+
+<!-- DISTANCE -->
+<select id="distanceFilter">
+<option value="">Distance (km)</option>
+<option value="5">5 km</option>
+<option value="10">10 km</option>
+<option value="15">15 km</option>
+<option value="20">20 km</option>
+<option value="30">30 km</option>
 </select>
 
 <div id="schoolList"></div>
@@ -72,67 +119,116 @@ select, input {
 
 <script>
 
-// SAMPLE DATA (we will replace with your real data later)
+// SAMPLE DATA (we’ll replace with your real data later)
 const schools = [
-  {
-    name: "Allen Glen High School",
-    district: "Johannesburg West",
-    pass2024: 95,
-    pass2025: 97,
-    bachelor2024: 60,
-    bachelor2025: 65
-  },
-  {
-    name: "Princess High School",
-    district: "Johannesburg West",
-    pass2024: 98,
-    pass2025: 100,
-    bachelor2024: 70,
-    bachelor2025: 75
-  }
+{
+name: "Allen Glen High School",
+district: "Johannesburg West",
+lat: -26.1,
+lon: 27.9,
+pass2024: 95,
+pass2025: 97,
+bachelor2024: 60,
+bachelor2025: 65,
+image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914"
+},
+{
+name: "Princess High School",
+district: "Johannesburg West",
+lat: -26.2,
+lon: 27.8,
+pass2024: 98,
+pass2025: 100,
+bachelor2024: 70,
+bachelor2025: 75,
+image: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc"
+}
 ];
 
-function getTrend(current, previous) {
-  if (current > previous) return '<span class="trend-up">⬆️</span>';
-  if (current < previous) return '<span class="trend-down">⬇️</span>';
-  return '<span class="trend-same">➖</span>';
+let userLat = null;
+let userLon = null;
+
+// GET LOCATION
+function getLocation() {
+navigator.geolocation.getCurrentPosition(position => {
+userLat = position.coords.latitude;
+userLon = position.coords.longitude;
+alert("Location captured!");
+displaySchools();
+});
 }
 
-function displaySchools() {
-  const district = document.getElementById("districtFilter").value;
-  const minPass = document.getElementById("passFilter").value;
+// DISTANCE CALCULATION
+function getDistance(lat1, lon1, lat2, lon2) {
+const R = 6371;
+const dLat = (lat2-lat1) * Math.PI/180;
+const dLon = (lon2-lon1) * Math.PI/180;
 
-  const list = document.getElementById("schoolList");
-  list.innerHTML = "";
+const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) *
+Math.sin(dLon/2)*Math.sin(dLon/2);
 
-  schools.forEach(school => {
-
-    if (district && school.district !== district) return;
-    if (minPass && school.pass2025 < minPass) return;
-
-    const card = document.createElement("div");
-    card.className = "school-card";
-
-    card.innerHTML = `
-      <h3>${school.name}</h3>
-      <p>${school.district}</p>
-
-      <p>
-        2024 → Pass: ${school.pass2024}% | Bachelor: ${school.bachelor2024}%
-      </p>
-
-      <p>
-        2025 → Pass: ${school.pass2025}% ${getTrend(school.pass2025, school.pass2024)}
-        | Bachelor: ${school.bachelor2025}% ${getTrend(school.bachelor2025, school.bachelor2024)}
-      </p>
-    `;
-
-    list.appendChild(card);
-  });
+const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+return R * c;
 }
 
-document.getElementById("districtFilter").addEventListener("change", displaySchools);
-document.getElementById("passFilter").addEventListener("change", displaySchools);
+// TREND
+function trend(curr, prev){
+if(curr>prev) return '<span class="trend-up">⬆️</span>';
+if(curr<prev) return '<span class="trend-down">⬇️</span>';
+return '<span class="trend-same">➖</span>';
+}
+
+// DISPLAY
+function displaySchools(){
+const district = document.getElementById("districtFilter").value;
+const minPass = document.getElementById("passFilter").value;
+const maxDistance = document.getElementById("distanceFilter").value;
+
+const list = document.getElementById("schoolList");
+list.innerHTML = "";
+
+schools.forEach(s => {
+
+if(district && s.district !== district) return;
+if(minPass && s.pass2025 < minPass) return;
+
+let distanceText = "";
+
+if(userLat && maxDistance){
+const dist = getDistance(userLat, userLon, s.lat, s.lon);
+if(dist > maxDistance) return;
+distanceText = `Distance: ${dist.toFixed(1)} km`;
+}
+
+const card = document.createElement("div");
+card.className = "school-card";
+
+card.innerHTML = `
+<img src="${s.image}">
+<div class="school-info">
+<h3>${s.name}</h3>
+<p>${s.district}</p>
+
+<p>2024 → Pass: ${s.pass2024}% | Bachelor: ${s.bachelor2024}%</p>
+
+<p>
+2025 → Pass: ${s.pass2025}% ${trend(s.pass2025,s.pass2024)}
+| Bachelor: ${s.bachelor2025}% ${trend(s.bachelor2025,s.bachelor2024)}
+</p>
+
+<p>${distanceText}</p>
+</div>
+`;
+
+list.appendChild(card);
+
+});
+}
+
+document.getElementById("districtFilter").onchange = displaySchools;
+document.getElementById("passFilter").onchange = displaySchools;
+document.getElementById("distanceFilter").onchange = displaySchools;
 
 displaySchools();
 
