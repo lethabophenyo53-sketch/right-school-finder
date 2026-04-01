@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Right School Finder</title>
+<title>School Dashboard</title>
 
 <style>
 body {
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   margin: 0;
-  background: #f4f6fb;
+  background: #f4f6f9;
 }
 
 header {
-  background: linear-gradient(135deg, #1e88e5, #42a5f5);
+  background: #2c3e50;
   color: white;
-  padding: 20px;
+  padding: 15px;
   text-align: center;
 }
 
@@ -23,205 +22,96 @@ header {
   padding: 15px;
 }
 
-select, input, button {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-button {
-  background: #1e88e5;
-  color: white;
-  border: none;
-}
-
 .school-card {
   background: white;
-  margin-bottom: 15px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.school-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
+.school-name {
+  font-size: 18px;
+  font-weight: bold;
 }
 
-.school-info {
-  padding: 12px;
+.district {
+  color: gray;
+  margin-bottom: 5px;
 }
 
-.trend-up { color: green; }
-.trend-down { color: red; }
-.trend-same { color: gray; }
+.rate {
+  margin: 3px 0;
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>Right School Finder</h1>
-  <p>Don’t judge a school by its reputation — choose based on real performance.</p>
+  <h2>📚 School Performance Dashboard</h2>
 </header>
 
-<div class="container">
-
-<input id="manualLocation" placeholder="Enter location (optional)">
-<button onclick="getLocation()">Use My Current Location</button>
-
-<select id="districtFilter">
-<option value="">Select District</option>
-<option>Johannesburg Central</option>
-<option>Johannesburg East</option>
-<option>Johannesburg West</option>
-<option>Johannesburg North</option>
-<option>Johannesburg South</option>
-<option>Tshwane North</option>
-<option>Tshwane South</option>
-<option>Tshwane West</option>
-<option>Ekurhuleni North</option>
-<option>Ekurhuleni South</option>
-<option>Sedibeng East</option>
-<option>Sedibeng West</option>
-<option>Gauteng East</option>
-<option>Gauteng West</option>
-<option>Gauteng North</option>
-</select>
-
-<select id="passFilter">
-<option value="">Minimum Pass Rate</option>
-<option value="70">70%</option>
-<option value="80">80%</option>
-<option value="90">90%</option>
-</select>
-
-<select id="distanceFilter">
-<option value="">Distance (km)</option>
-<option value="5">5 km</option>
-<option value="10">10 km</option>
-<option value="15">15 km</option>
-<option value="20">20 km</option>
-<option value="30">30 km</option>
-</select>
-
-<div id="schoolList"></div>
-
-</div>
+<div class="container" id="schoolList"></div>
 
 <script>
 
-// 🔗 GOOGLE SHEET CONNECTION
-const sheetID = "1mxPR7rN4E-ZEVKw0O3b2T0aaVGCk9snxIZoOvFY9KIU";
-const url = `https://opensheet.elk.sh/${sheetID}/Sheet1`;
+// =======================
+// 📊 YOUR FULL DATA
+// =======================
 
-let schools = [];
+const schools = [
+{ name:"Acudeo College Protea Glen", district:"Johannesburg Central", pass:93.23, bachelor:53.05 },
+{ name:"Adelaide Tambo Secondary", district:"Johannesburg Central", pass:93.96, bachelor:14.39 },
+{ name:"Allied School", district:"Johannesburg Central", pass:100, bachelor:66.67 },
+{ name:"Altmont Technical High", district:"Johannesburg Central", pass:81.97, bachelor:12.39 },
+{ name:"Aurora Comprehensive", district:"Johannesburg Central", pass:90.67, bachelor:34.77 },
+{ name:"Basis Protea Glen", district:"Johannesburg Central", pass:97.44, bachelor:51.12 },
 
-fetch(url)
-  .then(res => res.json())
-  .then(data => {
-    schools = data.map(s => ({
-      name: s.School,
-      district: s.District,
-      pass2025: Number(s.Pass),
-      bachelor2025: Number(s.Bachelor),
+// ---- EKURHULENI SOUTH ----
+{ name:"Alberton High School", district:"Ekurhuleni South", pass:100, bachelor:79.31 },
+{ name:"Boksburg High School", district:"Ekurhuleni South", pass:91.33, bachelor:58.31 },
+{ name:"Bracken High School", district:"Ekurhuleni South", pass:99.07, bachelor:67.25 },
 
-      // temporary (same values for now)
-      pass2024: Number(s.Pass),
-      bachelor2024: Number(s.Bachelor),
+// ---- GAUTENG NORTH ----
+{ name:"Hoërskool Erasmus", district:"Gauteng North", pass:97.27, bachelor:69.27 },
+{ name:"Lesedi Secondary", district:"Gauteng North", pass:87.58, bachelor:46.03 },
 
-      lat: -26.2,
-      lon: 28.0,
-      image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914"
-    }));
+// ---- ADD MORE EXACT SAME WAY ----
+{ name:"Hoërskool Florida", district:"Johannesburg West", pass:99.31, bachelor:81.07 },
+{ name:"Hoërskool Linden", district:"Johannesburg North", pass:98.11, bachelor:94.34 },
+{ name:"Pretoria Boys High School", district:"Tshwane South", pass:99.67, bachelor:89.7 },
 
-    displaySchools();
-  });
+];
 
-// LOCATION
-let userLat = null;
-let userLon = null;
+// =======================
+// 🧠 DISPLAY FUNCTION
+// =======================
 
-function getLocation() {
-  navigator.geolocation.getCurrentPosition(position => {
-    userLat = position.coords.latitude;
-    userLon = position.coords.longitude;
-    alert("Location captured!");
-    displaySchools();
-  });
-}
-
-// DISTANCE
-function getDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2-lat1) * Math.PI/180;
-  const dLon = (lon2-lon1) * Math.PI/180;
-
-  const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
-  Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) *
-  Math.sin(dLon/2)*Math.sin(dLon/2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
-
-// TREND
-function trend(curr, prev){
-  if(curr>prev) return '<span class="trend-up">⬆️</span>';
-  if(curr<prev) return '<span class="trend-down">⬇️</span>';
-  return '<span class="trend-same">➖</span>';
-}
-
-// DISPLAY
-function displaySchools(){
-  const district = document.getElementById("districtFilter").value;
-  const minPass = document.getElementById("passFilter").value;
-  const maxDistance = document.getElementById("distanceFilter").value;
+function showSchools() {
 
   const list = document.getElementById("schoolList");
   list.innerHTML = "";
 
-  schools.forEach(s => {
-
-    if(district && s.district !== district) return;
-    if(minPass && s.pass2025 < Number(minPass)) return;
-
-    let distanceText = "";
-
-    if(userLat && maxDistance){
-      const dist = getDistance(userLat, userLon, s.lat, s.lon);
-      if(dist > maxDistance) return;
-      distanceText = `Distance: ${dist.toFixed(1)} km`;
-    }
+  schools.forEach(school => {
 
     const card = document.createElement("div");
     card.className = "school-card";
 
     card.innerHTML = `
-      <img src="${s.image}">
-      <div class="school-info">
-      <h3>${s.name}</h3>
-      <p>${s.district}</p>
+      <div class="school-name">${school.name}</div>
+      <div class="district">${school.district}</div>
 
-      <p>2025 → Pass: ${s.pass2025}% ${trend(s.pass2025,s.pass2024)}
-      | Bachelor: ${s.bachelor2025}% ${trend(s.bachelor2025,s.bachelor2024)}</p>
-
-      <p>${distanceText}</p>
-      </div>
+      <div class="rate">📊 Pass Rate: ${school.pass}%</div>
+      <div class="rate">🎓 Bachelor Rate: ${school.bachelor}%</div>
     `;
 
     list.appendChild(card);
-
   });
 }
 
-// FILTER EVENTS
-document.getElementById("districtFilter").onchange = displaySchools;
-document.getElementById("passFilter").onchange = displaySchools;
-document.getElementById("distanceFilter").onchange = displaySchools;
+showSchools();
 
 </script>
 
