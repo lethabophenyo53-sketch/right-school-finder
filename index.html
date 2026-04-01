@@ -70,12 +70,9 @@ button {
 
 <div class="container">
 
-<!-- LOCATION -->
 <input id="manualLocation" placeholder="Enter location (optional)">
-
 <button onclick="getLocation()">Use My Current Location</button>
 
-<!-- DISTRICT -->
 <select id="districtFilter">
 <option value="">Select District</option>
 <option>Johannesburg Central</option>
@@ -95,7 +92,6 @@ button {
 <option>Gauteng North</option>
 </select>
 
-<!-- PASS FILTER -->
 <select id="passFilter">
 <option value="">Minimum Pass Rate</option>
 <option value="70">70%</option>
@@ -103,7 +99,6 @@ button {
 <option value="90">90%</option>
 </select>
 
-<!-- DISTANCE -->
 <select id="distanceFilter">
 <option value="">Distance (km)</option>
 <option value="5">5 km</option>
@@ -119,118 +114,114 @@ button {
 
 <script>
 
-// SAMPLE DATA (we’ll replace with your real data later)
-const schools = [
-{
-name: "Allen Glen High School",
-district: "Johannesburg West",
-lat: -26.1,
-lon: 27.9,
-pass2024: 95,
-pass2025: 97,
-bachelor2024: 60,
-bachelor2025: 65,
-image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914"
-},
-{
-name: "Princess High School",
-district: "Johannesburg West",
-lat: -26.2,
-lon: 27.8,
-pass2024: 98,
-pass2025: 100,
-bachelor2024: 70,
-bachelor2025: 75,
-image: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc"
-}
-];
+// 🔗 GOOGLE SHEET CONNECTION
+const sheetID = "1mxPR7rN4E-ZEVKw0O3b2T0aaVGCk9snxIZoOvFY9KIU";
+const url = `https://opensheet.elk.sh/${sheetID}/Sheet1`;
 
+let schools = [];
+
+fetch(url)
+  .then(res => res.json())
+  .then(data => {
+    schools = data.map(s => ({
+      name: s.School,
+      district: s.District,
+      pass2025: Number(s.Pass),
+      bachelor2025: Number(s.Bachelor),
+
+      // temporary (same values for now)
+      pass2024: Number(s.Pass),
+      bachelor2024: Number(s.Bachelor),
+
+      lat: -26.2,
+      lon: 28.0,
+      image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914"
+    }));
+
+    displaySchools();
+  });
+
+// LOCATION
 let userLat = null;
 let userLon = null;
 
-// GET LOCATION
 function getLocation() {
-navigator.geolocation.getCurrentPosition(position => {
-userLat = position.coords.latitude;
-userLon = position.coords.longitude;
-alert("Location captured!");
-displaySchools();
-});
+  navigator.geolocation.getCurrentPosition(position => {
+    userLat = position.coords.latitude;
+    userLon = position.coords.longitude;
+    alert("Location captured!");
+    displaySchools();
+  });
 }
 
-// DISTANCE CALCULATION
+// DISTANCE
 function getDistance(lat1, lon1, lat2, lon2) {
-const R = 6371;
-const dLat = (lat2-lat1) * Math.PI/180;
-const dLon = (lon2-lon1) * Math.PI/180;
+  const R = 6371;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLon = (lon2-lon1) * Math.PI/180;
 
-const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
-Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) *
-Math.sin(dLon/2)*Math.sin(dLon/2);
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+  Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) *
+  Math.sin(dLon/2)*Math.sin(dLon/2);
 
-const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-return R * c;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
 }
 
 // TREND
 function trend(curr, prev){
-if(curr>prev) return '<span class="trend-up">⬆️</span>';
-if(curr<prev) return '<span class="trend-down">⬇️</span>';
-return '<span class="trend-same">➖</span>';
+  if(curr>prev) return '<span class="trend-up">⬆️</span>';
+  if(curr<prev) return '<span class="trend-down">⬇️</span>';
+  return '<span class="trend-same">➖</span>';
 }
 
 // DISPLAY
 function displaySchools(){
-const district = document.getElementById("districtFilter").value;
-const minPass = document.getElementById("passFilter").value;
-const maxDistance = document.getElementById("distanceFilter").value;
+  const district = document.getElementById("districtFilter").value;
+  const minPass = document.getElementById("passFilter").value;
+  const maxDistance = document.getElementById("distanceFilter").value;
 
-const list = document.getElementById("schoolList");
-list.innerHTML = "";
+  const list = document.getElementById("schoolList");
+  list.innerHTML = "";
 
-schools.forEach(s => {
+  schools.forEach(s => {
 
-if(district && s.district !== district) return;
-if(minPass && s.pass2025 < minPass) return;
+    if(district && s.district !== district) return;
+    if(minPass && s.pass2025 < Number(minPass)) return;
 
-let distanceText = "";
+    let distanceText = "";
 
-if(userLat && maxDistance){
-const dist = getDistance(userLat, userLon, s.lat, s.lon);
-if(dist > maxDistance) return;
-distanceText = `Distance: ${dist.toFixed(1)} km`;
+    if(userLat && maxDistance){
+      const dist = getDistance(userLat, userLon, s.lat, s.lon);
+      if(dist > maxDistance) return;
+      distanceText = `Distance: ${dist.toFixed(1)} km`;
+    }
+
+    const card = document.createElement("div");
+    card.className = "school-card";
+
+    card.innerHTML = `
+      <img src="${s.image}">
+      <div class="school-info">
+      <h3>${s.name}</h3>
+      <p>${s.district}</p>
+
+      <p>2025 → Pass: ${s.pass2025}% ${trend(s.pass2025,s.pass2024)}
+      | Bachelor: ${s.bachelor2025}% ${trend(s.bachelor2025,s.bachelor2024)}</p>
+
+      <p>${distanceText}</p>
+      </div>
+    `;
+
+    list.appendChild(card);
+
+  });
 }
 
-const card = document.createElement("div");
-card.className = "school-card";
-
-card.innerHTML = `
-<img src="${s.image}">
-<div class="school-info">
-<h3>${s.name}</h3>
-<p>${s.district}</p>
-
-<p>2024 → Pass: ${s.pass2024}% | Bachelor: ${s.bachelor2024}%</p>
-
-<p>
-2025 → Pass: ${s.pass2025}% ${trend(s.pass2025,s.pass2024)}
-| Bachelor: ${s.bachelor2025}% ${trend(s.bachelor2025,s.bachelor2024)}
-</p>
-
-<p>${distanceText}</p>
-</div>
-`;
-
-list.appendChild(card);
-
-});
-}
-
+// FILTER EVENTS
 document.getElementById("districtFilter").onchange = displaySchools;
 document.getElementById("passFilter").onchange = displaySchools;
 document.getElementById("distanceFilter").onchange = displaySchools;
-
-displaySchools();
 
 </script>
 
