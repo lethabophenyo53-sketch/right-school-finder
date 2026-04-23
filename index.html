@@ -107,264 +107,158 @@ button {
 // =======================
 // SCHOOL DATA
 // =======================
-const schoolsData = [
-  // JOHANNESBURG CENTRAL
-  {
-    name: "Acudeo College Protea Glen",
-    district: "Johannesburg Central",
-    passRate: 93.23,
-    bachelorRate: 53.05,
-    phase: "Secondary",
-    distanceOptions: [5,10,15,20,25,30]
-  },
-  {
-    name: "Allied School",
-    district: "Johannesburg Central",
-    passRate: 100,
-    bachelorRate: 66.67,
-    phase: "Secondary",
-    distanceOptions: [5,10,15,20,25,30]
-  },
-  {
-    name: "Lenasia Secondary",
-    district: "Johannesburg Central",
-    passRate: 95.55,
-    bachelorRate: 76.68,
-    phase: "Secondary"
-  },
-  {
-    name: "Nam-Ul-Islam School",
-    district: "Johannesburg Central",
-    passRate: 100,
-    bachelorRate: 95.95,
-    phase: "Secondary"
-  },
+const schools = [
 
-  // EKURHULENI SOUTH
-  {
-    name: "Alberton High School",
-    district: "Ekurhuleni South",
-    passRate: 100,
-    bachelorRate: 79.31
-  },
-  {
-    name: "Bracken High School",
-    district: "Ekurhuleni South",
-    passRate: 99.07,
-    bachelorRate: 67.25
-  },
-  {
-    name: "Royal School Sky City",
-    district: "Ekurhuleni South",
-    passRate: 100,
-    bachelorRate: 96.35
-  },
-  {
-    name: "Sunward Park High School",
-    district: "Ekurhuleni South",
-    passRate: 96.35,
-    bachelorRate: 63.53
-  },
+{
+id:1,
+name:"Acudeo College Protea Glen",
+district:"Johannesburg Central",
+pass:93.23,
+bachelor:53.05,
+lat:-26.340,
+lon:27.860
+},
 
-  // EKURHULENI NORTH
-  {
-    name: "Benoni High School",
-    district: "Ekurhuleni North",
-    passRate: 99.62,
-    bachelorRate: 77.03
-  },
-  {
-    name: "Edenvale High School",
-    district: "Ekurhuleni North",
-    passRate: 97.44,
-    bachelorRate: 72.65
-  },
-  {
-    name: "Jiyana Secondary",
-    district: "Ekurhuleni North",
-    passRate: 99.37,
-    bachelorRate: 82.03
-  },
+{
+id:2,
+name:"Allied School",
+district:"Johannesburg Central",
+pass:100,
+bachelor:66.67,
+lat:-26.310,
+lon:27.900
+},
 
-  // GAUTENG NORTH
-  {
-    name: "Hoërskool Erasmus",
-    district: "Gauteng North",
-    passRate: 97.27,
-    bachelorRate: 69.27
-  },
-  {
-    name: "Star Of Hope School",
-    district: "Gauteng North",
-    passRate: 97.96,
-    bachelorRate: 69.39
-  },
+{
+id:3,
+name:"Lenasia Secondary",
+district:"Johannesburg Central",
+pass:95.55,
+bachelor:76.68,
+lat:-26.320,
+lon:27.830
+},
 
-  // SEDIBENG WEST
-  {
-    name: "Hoërskool Transvalia",
-    district: "Sedibeng West",
-    passRate: 98.16,
-    bachelorRate: 82.11
-  },
-  {
-    name: "Poelano Secondary",
-    district: "Sedibeng West",
-    passRate: 93.36,
-    bachelorRate: 55.63
-  },
+{
+id:4,
+name:"Alberton High School",
+district:"Ekurhuleni South",
+pass:100,
+bachelor:79.31,
+lat:-26.260,
+lon:28.120
+},
 
-  // GAUTENG EAST
-  {
-    name: "Springs Girls High School",
-    district: "Gauteng East",
-    passRate: 97.75,
-    bachelorRate: 82.58
-  },
-  {
-    name: "Hoërskool Hugenote",
-    district: "Gauteng East",
-    passRate: 99.45,
-    bachelorRate: 77.60
-  },
+{
+id:5,
+name:"Bracken High School",
+district:"Ekurhuleni South",
+pass:99.07,
+bachelor:67.25,
+lat:-26.300,
+lon:28.130
+},
 
-  // JOHANNESBURG WEST
-  {
-    name: "Allen Glen High School",
-    district: "Johannesburg West",
-    passRate: 97.52,
-    bachelorRate: 60.33
-  },
-  {
-    name: "Hoërskool Florida",
-    district: "Johannesburg West",
-    passRate: 99.31,
-    bachelorRate: 81.07
-  },
+{
+id:6,
+name:"Royal School Sky City",
+district:"Ekurhuleni South",
+pass:100,
+bachelor:96.35,
+lat:-26.360,
+lon:28.110
+},
 
-  // TSHWANE NORTH
-  {
-    name: "Hoërskool Montana",
-    district: "Tshwane North",
-    passRate: 100,
-    bachelorRate: 84.82
-  },
-  {
-    name: "Pretoria North High",
-    district: "Tshwane North",
-    passRate: 93.89,
-    bachelorRate: 48.74
-  },
+{
+id:7,
+name:"Benoni High School",
+district:"Ekurhuleni North",
+pass:99.62,
+bachelor:77.03,
+lat:-26.190,
+lon:28.320
+},
 
-  // JOHANNESBURG NORTH
-  {
-    name: "Bryanston High School",
-    district: "Johannesburg North",
-    passRate: 98.26,
-    bachelorRate: 77.21
-  },
-  {
-    name: "Greenside High School",
-    district: "Johannesburg North",
-    passRate: 98.81,
-    bachelorRate: 83.80
-  },
-  {
-    name: "Northcliff High School",
-    district: "Johannesburg North",
-    passRate: 99.41,
-    bachelorRate: 87.83
-  },
+{
+id:8,
+name:"Edenvale High School",
+district:"Johannesburg East",
+pass:98.33,
+bachelor:78.47,
+lat:-26.140,
+lon:28.160
+},
 
-  // TSHWANE SOUTH
-  {
-    name: "Afrikaanse Hoër Meisieskool",
-    district: "Tshwane South",
-    passRate: 100,
-    bachelorRate: 97.58
-  },
-  {
-    name: "Hoërskool Garsfontein",
-    district: "Tshwane South",
-    passRate: 99.44,
-    bachelorRate: 94.35
-  },
-  {
-    name: "Pretoria Boys High School",
-    district: "Tshwane South",
-    passRate: 99.67,
-    bachelorRate: 89.70
-  },
+{
+id:9,
+name:"Hoërskool Garsfontein",
+district:"Tshwane South",
+pass:99.44,
+bachelor:94.35,
+lat:-25.780,
+lon:28.300
+},
 
-  // JOHANNESBURG EAST
-  {
-    name: "Jeppe High School for Girls",
-    district: "Johannesburg East",
-    passRate: 100,
-    bachelorRate: 91.23
-  },
-  {
-    name: "King Edward VII School",
-    district: "Johannesburg East",
-    passRate: 98.27,
-    bachelorRate: 83.12
-  },
-  {
-    name: "St. Stithians College",
-    district: "Johannesburg East",
-    passRate: 100,
-    bachelorRate: 98.56
-  },
+{
+id:10,
+name:"Pretoria Boys High School",
+district:"Tshwane South",
+pass:99.67,
+bachelor:89.70,
+lat:-25.750,
+lon:28.220
+},
 
-  // TSHWANE WEST
-  {
-    name: "Acudeo College Kirkney",
-    district: "Tshwane West",
-    passRate: 98.04,
-    bachelorRate: 61.18
-  },
-  {
-    name: "Hoërskool Pretoria-Noord",
-    district: "Tshwane West",
-    passRate: 93.44,
-    bachelorRate: 75.84
-  },
+{
+id:11,
+name:"Bryanston High School",
+district:"Johannesburg North",
+pass:98.26,
+bachelor:77.21,
+lat:-26.050,
+lon:28.030
+},
 
-  // JOHANNESBURG SOUTH
-  {
-    name: "Glenvista High School",
-    district: "Johannesburg South",
-    passRate: 96.34,
-    bachelorRate: 62.13
-  },
-  {
-    name: "Waterstone College",
-    district: "Johannesburg South",
-    passRate: 100,
-    bachelorRate: 83.85
-  },
+{
+id:12,
+name:"Greenside High School",
+district:"Johannesburg North",
+pass:98.81,
+bachelor:83.80,
+lat:-26.150,
+lon:28.000
+},
 
-  // SEDIBENG EAST
-  {
-    name: "Hoërskool Overvaal",
-    district: "Sedibeng East",
-    passRate: 99.22,
-    bachelorRate: 84.50
-  },
+{
+id:13,
+name:"Northcliff High School",
+district:"Johannesburg North",
+pass:99.41,
+bachelor:87.83,
+lat:-26.130,
+lon:27.980
+},
 
-  // GAUTENG WEST
-  {
-    name: "Aletheia Christian College",
-    district: "Gauteng West",
-    passRate: 100,
-    bachelorRate: 96.15
-  },
-  {
-    name: "Hoërskool Noordheuwel",
-    district: "Gauteng West",
-    passRate: 100,
-    bachelorRate: 92.23
-  }
+{
+id:14,
+name:"Hoërskool Florida",
+district:"Johannesburg West",
+pass:99.31,
+bachelor:81.07,
+lat:-26.170,
+lon:27.920
+},
+
+{
+id:15,
+name:"Allen Glen High School",
+district:"Johannesburg West",
+pass:97.52,
+bachelor:60.33,
+lat:-26.110,
+lon:27.900
+}
+
 ];
 
 // =======================
