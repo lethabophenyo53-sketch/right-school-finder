@@ -82,15 +82,42 @@ button {
 
 <select id="district">
 <option value="">All Districts</option>
-<option>Johannesburg West</option>
 <option>Johannesburg Central</option>
-</select>
+<option>Johannesburg West</option>
+<option>Johannesburg East</option>
+<option>Johannesburg North</option>
+<option>Johannesburg South</option>
 
+<option>Ekurhuleni North</option>
+<option>Ekurhuleni South</option>
+
+<option>Tshwane North</option>
+<option>Tshwane South</option>
+<option>Tshwane West</option>
+
+<option>Gauteng North</option>
+<option>Gauteng East</option>
+<option>Gauteng West</option>
+
+<option>Sedibeng East</option>
+<option>Sedibeng West</option>
+</select>
+  
 <select id="pass">
 <option value="">Min Pass Rate</option>
 <option value="70">70%</option>
 <option value="80">80%</option>
 <option value="90">90%</option>
+</select>
+
+  <select id="radius">
+<option value="">Distance From Me</option>
+<option value="5">5 km</option>
+<option value="10">10 km</option>
+<option value="15">15 km</option>
+<option value="20">20 km</option>
+<option value="25">25 km</option>
+<option value="30">30 km</option>
 </select>
 
 <button onclick="getLocation()">📍 Find My Location</button>
@@ -358,12 +385,19 @@ markers = [];
 const search = document.getElementById("search").value.toLowerCase();
 const district = document.getElementById("district").value;
 const pass = document.getElementById("pass").value;
+const radius = document.getElementById("radius").value;
 
 schools.forEach(s=>{
 
 if(search && !s.name.toLowerCase().includes(search)) return;
 if(district && s.district !== district) return;
 if(pass && s.pass < pass) return;
+if(userLat && radius){
+
+if(distance(userLat,userLon,s.lat,s.lon) > radius)
+return;
+
+}
 
 let distText = "";
 
@@ -378,18 +412,37 @@ const card = document.createElement("div");
 card.className = "card";
 
 card.innerHTML = `
+
 <h3>${s.name}</h3>
-<p>${s.district}</p>
-<p>Pass: ${s.pass}%</p>
+
+<p><strong>District:</strong> ${s.district}</p>
+
+<p>
+🎓 Pass Rate:
+<strong>${s.pass}%</strong>
+</p>
+
+<p>
+🏅 Bachelor Pass:
+<strong>${s.bachelor}%</strong>
+</p>
+
 <p>${distText}</p>
 
+${s.pass >= 95
+? `<p style="color:green;font-weight:bold;">
+🏆 Top Performing School
+</p>`
+: ""}
+
 <button onclick="openDirections(${s.lat},${s.lon})">
-Directions
+📍 Directions
 </button>
 
 <button class="fav" onclick="toggleFav(${s.id})">
 ${isFav ? "★ Saved" : "☆ Save"}
 </button>
+
 `;
 
 list.appendChild(card);
@@ -397,8 +450,13 @@ list.appendChild(card);
 // MAP MARKER
 let marker = L.marker([s.lat,s.lon])
 .addTo(map)
-.bindPopup(`<b>${s.name}</b><br>${s.pass}%`);
-
+.bindPopup(`
+<b>${s.name}</b><br>
+District: ${s.district}<br>
+Pass Rate: ${s.pass}%<br>
+Bachelor Rate: ${s.bachelor}%<br>
+${s.pass >=95 ? "🏆 Top Performer" : ""}
+`);
 markers.push(marker);
 
 });
@@ -416,6 +474,7 @@ window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`);
 document.getElementById("search").oninput = display;
 document.getElementById("district").onchange = display;
 document.getElementById("pass").onchange = display;
+document.getElementById("radius").onchange = display;
 
 display();
 
